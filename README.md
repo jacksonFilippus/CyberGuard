@@ -134,18 +134,6 @@ CyberGuard/
     └── test_scanners.py
 ```
 
-## GitHub submission checklist
-
-1. Create a GitHub repository named `CyberGuard` (or another name you prefer).
-2. Commit the complete source code, templates, static assets, tests, `.env.example`, and README.
-3. **Do not commit** `.env`, `.venv/`, API keys, or Python cache folders.
-4. Push the project to GitHub.
-5. In GitHub, open **Settings → Collaborators** and invite:
-   - `erich@goldenswitchtech.com`
-   - `quincy@goldenswitchtech.com`
-6. Clone the repository into a fresh folder and follow the README instructions to confirm that installation and startup work.
-7. Test each scanner with safe sample inputs and test the quiz submission before presenting.
-
 ## Limitations and responsible use
 
 - Email analysis is based on explainable text patterns; it does not authenticate the sender or inspect attachments.
