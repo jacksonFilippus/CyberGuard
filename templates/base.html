@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#070b16">
+    <meta name="description"
+          content="CyberGuard helps you examine suspicious emails, URLs and files, and learn practical cybersecurity skills.">
+
+    <title>{% block title %}CyberGuard | Digital Security{% endblock %}</title>
+
+    
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+          
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="cyber-grid" aria-hidden="true"></div>
+
+    <nav class="navbar">
+        <a class="brand" href="{{ url_for('home') }}"
+           aria-label="CyberGuard home">
+
+            <span class="brand-icon">
+                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+            </span>
+
+            <span class="brand-text">
+                Cyber<span>Guard</span>
+                <small>PERSONAL CYBER DEFENCE</small>
+            </span>
+        </a>
+
+        <button class="mobile-menu-toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="nav-links">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <div class="nav-links" id="nav-links">
+            <a href="{{ url_for('home') }}">
+                <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="{{ url_for('email_scan') }}">
+                <i class="bi bi-envelope-exclamation" aria-hidden="true"></i>
+                <span>Email Scanner</span>
+            </a>
+
+            <a href="{{ url_for('url_scan') }}">
+                <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                <span>URL Scanner</span>
+            </a>
+
+            <a href="{{ url_for('file_scan') }}">
+                <i class="bi bi-file-earmark-lock" aria-hidden="true"></i>
+                <span>File Checker</span>
+            </a>
+
+            <a href="{{ url_for('learn') }}">
+                <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                <span>Daily Shield</span>
+            </a>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                <strong>CyberGuard</strong>
+                <p>Think before you click.</p>
+            </div>
+
+            <div class="footer-message">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                <span>
+                    Security checks help reduce risk, but cannot guarantee
+                    that an email, link or file is safe.
+                </span>
+            </div>
+
+            <p class="footer-copyright">
+                Built for a safer digital world.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const menuButton = document.querySelector(".mobile-menu-toggle");
+        const navLinks = document.querySelector(".nav-links");
+
+        if (menuButton && navLinks) {
+            menuButton.addEventListener("click", () => {
+                const isOpen = navLinks.classList.toggle("nav-open");
+
+                menuButton.setAttribute("aria-expanded", String(isOpen));
+                menuButton.setAttribute(
+                    "aria-label",
+                    isOpen ? "Close navigation menu" : "Open navigation menu"
+                );
+
+                menuButton.innerHTML = isOpen
+                    ? '<i class="bi bi-x-lg" aria-hidden="true"></i>'
+                    : '<i class="bi bi-list" aria-hidden="true"></i>';
+            });
+        }
+    </script>
+<script>
+document.addEventListener("mousemove", function (event) {
+    const mascot = document.getElementById("cgMascot");
+    if (!mascot) return;
+
+    const pupils = mascot.querySelectorAll(".cg-mascot-pupil");
+
+    pupils.forEach(function (pupil) {
+        const eye = pupil.parentElement;
+        const rect = eye.getBoundingClientRect();
+
+        const eyeX = rect.left + rect.width / 2;
+        const eyeY = rect.top + rect.height / 2;
+
+        const dx = event.clientX - eyeX;
+        const dy = event.clientY - eyeY;
+        const angle = Math.atan2(dy, dx);
+        const distance = Math.min(Math.hypot(dx, dy), 5);
+
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+
+        pupil.style.transform =
+            `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    });
+});
+</script>
+</body>
+</html>

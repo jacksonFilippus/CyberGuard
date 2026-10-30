@@ -1,0 +1,235 @@
+
+{% extends "base.html" %}
+
+{% block title %}CyberGuard | Digital Security{% endblock %}
+
+{% block content %}
+
+<section class="hero cg-hero">
+    <div class="hero-content cg-hero-content">
+
+        <p class="eyebrow cg-eyebrow">
+            <span class="live-dot"></span>
+            
+<div class="fx-signal" data-text="YOUR PERSONAL CYBERSECURITY ASSISTANT">YOUR PERSONAL CYBERSECURITY ASSISTANT</div>
+
+        </p>
+
+        
+    
+<h1>
+    <span class="fx-scanner">Stay one step ahead of cyber threats.</span>
+</h1>
+
+
+
+        <p class="hero-description">
+            Analyse suspicious emails, investigate links, and check files.
+            Understand the risks before they become problems.
+        </p>
+
+        <div class="hero-actions">
+            <a class="button button-primary cg-primary-button"
+               href="{{ url_for('email_scan') }}">
+                <i class="bi bi-envelope-exclamation"
+                   aria-hidden="true"></i>
+                Analyse an Email
+                <i class="bi bi-arrow-up-right"
+                   aria-hidden="true"></i>
+            </a>
+
+            <a class="button button-secondary cg-secondary-button"
+               href="{{ url_for('learn') }}">
+                <i class="bi bi-mortarboard"
+                   aria-hidden="true"></i>
+                Learn Cyber Safety
+            </a>
+        </div>
+
+        <div class="privacy-note cg-privacy-note">
+            <i class="bi bi-shield-check" aria-hidden="true"></i>
+            <p>
+                Your security matters. Review privacy warnings before
+                sharing information with external services.
+            </p>
+        </div>
+    </div>
+
+    
+<video class="cg-hero-video"
+       autoplay
+       muted
+       loop
+       playsinline
+       aria-hidden="true">
+    <source src="{{ url_for('static', filename='videos/cyber-bg.mp4') }}"
+            type="video/mp4">
+</video>
+
+<div class="cg-hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-visual cg-hero-visual"
+         aria-label="CyberGuard digital protection illustration">
+
+        
+
+        <div class="hero-glow"></div>
+
+        <div class="hero-shield">
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+        </div>
+
+        
+       
+
+        
+<img
+    src="{{ url_for('static', filename='images/phishing-image.jpeg') }}"
+    alt="Phishing awareness and cybersecurity illustration"
+    class="phishing-hero-image">
+
+    </div>
+</section>
+
+<section class="tools-section cg-tools-section">
+    <div class="section-heading cg-section-heading">
+        <p class="eyebrow"> <i class="bi bi-command"
+                                aria-hidden="true"></i>
+            SECURITY TOOLKIT
+        </p>
+
+        <h2>What would you like to <span>check?</span></h2>
+
+        <p>
+            Choose a tool to investigate a potential threat and understand
+            what to do next.
+        </p>
+    </div>
+
+    <div class="tool-grid cg-tool-grid">
+
+        <article class="tool-card cg-tool-card email-tool">
+            <div class="tool-card-top">
+                <div class="tool-icon">
+                    <i class="bi bi-envelope-exclamation"
+                       aria-hidden="true"></i>
+                </div>
+                <span class="tool-number">01</span>
+            </div>
+
+            <span class="tool-tag">MESSAGE SECURITY</span>
+
+            <h3>Email Scanner</h3>
+
+            <p>
+                Identify suspicious language, unusual requests,
+                and possible phishing signs before you respond.
+            </p>
+
+            <a class="tool-link"
+               href="{{ url_for('email_scan') }}">
+                Scan an email
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </article>
+
+        <article class="tool-card cg-tool-card url-tool">
+            <div class="tool-card-top">
+                <div class="tool-icon">
+                    <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                </div>
+                <span class="tool-number">02</span>
+            </div>
+
+            <span class="tool-tag">LINK INTELLIGENCE</span>
+
+            <h3>URL Scanner</h3>
+
+            <p>
+                Inspect suspicious links for warning signs and,
+                when configured, check known threat reports.
+            </p>
+
+            <a class="tool-link"
+               href="{{ url_for('url_scan') }}">
+                Investigate a link
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </article>
+
+        <article class="tool-card cg-tool-card file-tool">
+            <div class="tool-card-top">
+                <div class="tool-icon">
+                    <i class="bi bi-file-earmark-lock"
+                       aria-hidden="true"></i>
+                </div>
+                <span class="tool-number">03</span>
+            </div>
+
+            <span class="tool-tag">FILE INTELLIGENCE</span>
+
+            <h3>File Checker</h3>
+
+            <p>
+                Calculate a file's digital fingerprint and check
+                for known threats using available security reports.
+            </p>
+
+            <a class="tool-link"
+               href="{{ url_for('file_scan') }}">
+                Check a file
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </article>
+
+        <article class="tool-card cg-tool-card learning-card">
+            <div class="tool-card-top">
+                <div class="tool-icon">
+                    <i class="bi bi-mortarboard-fill"
+                       aria-hidden="true"></i>
+                </div>
+                <span class="tool-number">04</span>
+            </div>
+
+            <span class="tool-tag">CYBER ACADEMY</span>
+
+            <h3>Daily Shield</h3>
+
+            <p>
+                Test your knowledge, learn about cyber threats,
+                and build safer digital habits.
+            </p>
+
+            <a class="tool-link"
+               href="{{ url_for('learn') }}">
+                Start learning
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+        </article>
+
+    </div>
+</section>
+
+<section class="cg-awareness">
+    <div class="awareness-icon">
+        <i class="bi bi-lightbulb-fill" aria-hidden="true"></i>
+    </div>
+
+    <div class="awareness-content">
+        <p class="eyebrow">SECURITY REMINDER</p>
+        <h2>Pause. Check. Then click.</h2>
+        <p>
+            Unexpected messages, urgent requests, and unfamiliar links
+            deserve a closer look. Think critically before sharing
+            information or opening files.
+        </p>
+    </div>
+
+    <a href="{{ url_for('learn') }}"
+       class="awareness-link">
+        Improve your skills
+        <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+    </a>
+</section>
+
+{% endblock %}

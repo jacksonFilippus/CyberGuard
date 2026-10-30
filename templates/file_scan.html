@@ -1,0 +1,98 @@
+
+{% extends "base.html" %}
+
+{% block title %}File Checker | CyberGuard{% endblock %}
+
+{% block content %}
+<section class="tools-section">
+    <div class="section-heading">
+        <p class="eyebrow">FILE SECURITY</p>
+        <h2>Check a file's fingerprint</h2>
+<p style="color: #102A43;">
+Generate a SHA-256 hash and check for known threats.
+
+</p>
+</div>
+
+    <form method="POST"
+          action="{{ url_for('file_scan') }}"
+          enctype="multipart/form-data"
+          class="scan-form">
+
+        <label for="file">Choose a file (maximum 10 MB)</label>
+        <input id="file" name="file" type="file" required>
+
+        <p class="privacy-note">
+            The file is processed by this application and is not uploaded
+            to VirusTotal. Its SHA-256 hash is sent for a threat-report lookup.
+            Avoid checking confidential files without considering this disclosure.
+        </p>
+
+        <button class="button button-primary" type="submit">
+            Check File
+        </button>
+    </form>
+
+    {% if error %}
+    <div class="result-card">
+        <h3>Unable to check file</h3>
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="result-card">
+        <p class="eyebrow">FILE ANALYSIS</p>
+        <h2 style="color: #ececec;">{{ result.verdict }}</h2>
+
+        <p><strong>Filename:</strong> {{ result.filename }}</p>
+        <p><strong>Size:</strong> {{ result.size }} bytes</p>
+
+        <p><strong>SHA-256:</strong></p>
+        <p class="hash-value">{{ result.sha256 }}</p>
+
+        <p>{{ result.advice }}</p>
+
+        {% if result.threat_report %}
+        <hr>
+        <h3 style="color: #ececec;">VirusTotal Threat Intelligence</h3>
+
+        <p>{{ result.threat_report.message }}</p>
+
+        {% if result.threat_report.status in
+            ["flagged", "suspicious", "no_known_detection"] %}
+        <ul>
+            <li>Malicious detections:
+                {{ result.threat_report.malicious }}</li>
+            <li>Suspicious detections:
+                {{ result.threat_report.suspicious }}</li>
+            <li>Harmless detections:
+                {{ result.threat_report.harmless }}</li>
+            <li>Undetected:
+                {{ result.threat_report.undetected }}</li>
+            <li>Total reported results:
+                {{ result.threat_report.total }}</li>
+        </ul>
+        {% endif %}
+        {% endif %}
+
+        {% if result.ai_explanation %}
+        <hr>
+        <h3 style="color: #ececec;">AI Security Explanation</h3>
+<div class="ai-explanation">
+    {{ result.ai_explanation_html | safe }}
+</div>
+        {% endif %}
+
+        <hr>
+        <h3 style="color: #ececec;">What could have happened?</h3>
+        <p>
+            If a file contains malware and is opened, it could potentially
+            damage a device or expose information. The risks depend on the
+            file's actual behaviour. A hash match or a lack of detections
+            alone cannot prove that a file is safe.
+        </p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

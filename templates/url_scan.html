@@ -1,0 +1,101 @@
+
+{% extends "base.html" %}
+
+{% block title %}URL Scanner | CyberGuard{% endblock %}
+
+{% block content %}
+<section class="tools-section">
+    <div class="section-heading">
+        <p class="eyebrow">LINK SECURITY</p>
+        <h2>Check a suspicious link</h2>
+<p style="color: #102A43;">
+    Inspect basic URL warning signs without opening the website.
+
+</p>    </div>
+
+    <form method="POST" class="scan-form">
+        <label for="url">Website URL</label>
+        <input
+            id="url"
+            name="url"
+            type="text"
+            maxlength="2048"
+            placeholder="https://example.com"
+            value="{{ submitted_url or '' }}"
+            required
+        >
+
+        <p class="privacy-note">
+            This first version checks the address locally. It does not visit
+            the website or confirm whether it is malicious.
+        </p>
+
+        <button class="button button-primary" type="submit">
+            Analyse URL
+        </button>
+    </form>
+
+    {% if error %}
+    <div class="result-card">
+        <h3>Unable to analyse URL</h3>
+        <p>{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="result-card">
+        <p class="eyebrow">ANALYSIS RESULT</p>
+        <h2 style="color: #ececec;">{{ result.verdict }}</h2>
+
+        <p><strong>Address:</strong> {{ result.url }}</p>
+        <p><strong>Risk indicator score:</strong> {{ result.score }}/10</p>
+        <p>{{ result.advice }}</p>
+
+        <h3 style="color: #ececec;">Findings</h3>
+
+        {% if result.ai_explanation %}
+    <hr>
+    <h3 style="color: #ececec;">AI Security Explanation</h3>
+    <div class="ai-explanation">{{ result.ai_explanation_html | safe }}</div>
+{% endif %}
+
+        {% if result.findings %}
+        <ul>
+            {% for finding in result.findings %}
+            <li>{{ finding }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No obvious warning signs were found by these checks.</p>
+        {% endif %}
+
+        <h3 style="color: #ececec;">What could have happened?</h3>
+        <p>
+            If a link leads to a fraudulent login page, entering your
+            password could expose your account. This scan has not established
+            that this particular website does so.
+        </p>
+    </div>
+    
+{% if result.threat_report %}
+    <hr>
+    <h3 style="color: #102A43;">VirusTotal Reputation Report</h3>
+
+    <p>
+        {{ result.threat_report.message }}
+    </p>
+
+    {% if result.threat_report.status in ["flagged", "suspicious", "no_known_detection"] %}
+        <ul>
+            <li>Malicious detections: {{ result.threat_report.malicious }}</li>
+            <li>Suspicious detections: {{ result.threat_report.suspicious }}</li>
+            <li>Harmless detections: {{ result.threat_report.harmless }}</li>
+            <li>Undetected: {{ result.threat_report.undetected }}</li>
+            <li>Total reported results: {{ result.threat_report.total }}</li>
+        </ul>
+    {% endif %}
+{% endif %}
+
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,502 @@
+
+{% extends "base.html" %}
+
+{% block title %}Daily Shield | CyberGuard{% endblock %}
+
+{% block content %}
+<section class="tools-section daily-shield cg-learning-page">
+
+    <!-- Learning hero -->
+    <header class="ds-hero">
+        <div class="ds-hero-copy">
+            <p class="eyebrow">
+                <i class="bi bi-stars" aria-hidden="true"></i>
+                CYBERGUARD CYBER ACADEMY
+            </p>
+<h1 style="color: #ececec;">
+    <span class="fx-scanner">Knowledge is your <span>best defence.</span></span>
+</h1>
+           
+
+            <p>
+                Learn to recognise digital threats, strengthen your accounts,
+                and make safer decisions online.
+            </p>
+
+            <div class="ds-hero-stats">
+                <div>
+                    <i class="bi bi-journal-check" aria-hidden="true"></i>
+                    <span>Interactive quizzes</span>
+                </div>
+                <div>
+                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    <span>Video lessons</span>
+                </div>
+                <div>
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <span>Practical safety tips</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ds-hero-art" aria-hidden="true">
+            <div class="ds-art-shield">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <span class="ds-art-label">
+                <i class="bi bi-cpu"></i> LEARN · DETECT · PROTECT
+            </span>
+        </div>
+    </header>
+
+    {% if error %}
+        <p class="quiz-feedback incorrect">{{ error }}</p>
+    {% endif %}
+    {% if quiz_error %}
+        <p class="quiz-feedback incorrect" role="alert">{{ quiz_error }}</p>
+    {% endif %}
+
+    {% if not selected_category %}
+
+        <!-- Quiz categories -->
+        <div class="ds-section-heading">
+            <div>
+                <p class="eyebrow">CHOOSE YOUR TRAINING</p>
+                <h2>Select a learning path</h2>
+                <p style="color: #102A43";>Every quiz has 10 questions with explanations after submission.</p>
+            </div>
+            <span class="ds-count-badge">
+                <i class="bi bi-grid" aria-hidden="true"></i>
+                5 QUIZ MODES
+            </span>
+        </div>
+
+        <div class="quiz-category-grid ds-category-grid">
+
+            <a class="quiz-category-card ds-category-card ds-email"
+               href="{{ url_for('learn', category='email') }}">
+                <div class="ds-card-top">
+                    <span class="ds-category-icon">
+                        <i class="bi bi-envelope-exclamation"
+                           aria-hidden="true"></i>
+                    </span>
+                    <span class="ds-card-number">01</span>
+                </div>
+                <span class="ds-card-label">MESSAGE SECURITY</span>
+                <h3>Email Security</h3>
+                <p>Spot phishing, suspicious senders, fake requests and unsafe attachments.</p>
+                <span class="ds-card-action">Start quiz <i class="bi bi-arrow-up-right"></i></span>
+            </a>
+
+            <a class="quiz-category-card ds-category-card ds-url"
+               href="{{ url_for('learn', category='url') }}">
+                <div class="ds-card-top">
+                    <span class="ds-category-icon">
+                        <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                    </span>
+                    <span class="ds-card-number">02</span>
+                </div>
+                <span class="ds-card-label">LINK INTELLIGENCE</span>
+                <h3>URL &amp; Link Safety</h3>
+                <p>Recognise lookalike domains, suspicious links and misleading security signals.</p>
+                <span class="ds-card-action">Start quiz <i class="bi bi-arrow-up-right"></i></span>
+            </a>
+
+            <a class="quiz-category-card ds-category-card ds-file"
+               href="{{ url_for('learn', category='file') }}">
+                <div class="ds-card-top">
+                    <span class="ds-category-icon">
+                        <i class="bi bi-file-earmark-lock"
+                           aria-hidden="true"></i>
+                    </span>
+                    <span class="ds-card-number">03</span>
+                </div>
+                <span class="ds-card-label">FILE INTELLIGENCE</span>
+                <h3>File Security</h3>
+                <p>Learn about malware, safe downloads, file fingerprints and scan limitations.</p>
+                <span class="ds-card-action">Start quiz <i class="bi bi-arrow-up-right"></i></span>
+            </a>
+
+            <a class="quiz-category-card ds-category-card ds-password"
+               href="{{ url_for('learn', category='password') }}">
+                <div class="ds-card-top">
+                    <span class="ds-category-icon">
+                        <i class="bi bi-key-fill" aria-hidden="true"></i>
+                    </span>
+                    <span class="ds-card-number">04</span>
+                </div>
+                <span class="ds-card-label">ACCOUNT DEFENCE</span>
+                <h3>Password &amp; Account Security</h3>
+                <p>Build stronger passwords, use MFA and protect account recovery.</p>
+                <span class="ds-card-action">Start quiz <i class="bi bi-arrow-up-right"></i></span>
+            </a>
+
+            <a class="quiz-category-card ds-category-card ds-mixed mixed-category"
+               href="{{ url_for('learn', category='mixed') }}">
+                <div class="ds-card-top">
+                    <span class="ds-category-icon">
+                        <i class="bi bi-shield-fill-check"
+                           aria-hidden="true"></i>
+                    </span>
+                    <span class="ds-card-number">05</span>
+                </div>
+                <span class="ds-card-label">ALL-ROUND CHALLENGE</span>
+                <h3>Mixed Cybersecurity Quiz</h3>
+                <p>Test yourself across email, links, files and account security.</p>
+                <span class="ds-card-action">Take the challenge <i class="bi bi-arrow-up-right"></i></span>
+            </a>
+
+        </div>
+
+    {% else %}
+
+        <!-- Selected quiz -->
+        <div class="daily-lesson-card ds-quiz-intro">
+            <a class="ds-back-link" href="{{ url_for('learn') }}">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                All learning paths
+            </a>
+
+            <span class="lesson-category">{{ quiz_category }}</span>
+            <h2 style="color: #ececec;">{{ quiz_title }}</h2>
+            <p>Answer all 10 questions, then review your results and explanations.</p>
+
+            <div class="ds-quiz-meta">
+                <span><i class="bi bi-list-check"></i> 10 questions</span>
+                <span><i class="bi bi-lightbulb"></i> Explanations included</span>
+            </div>
+        </div>
+
+        <div class="daily-quiz-card ds-quiz-card">
+            {% if submitted %}
+                <div class="ds-result-banner">
+                    <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
+                    <div>
+                        <strong>Quiz completed</strong>
+                        <p>Review each explanation to strengthen your knowledge.</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="POST"
+                  action="{{ url_for('learn', category=selected_category) }}">
+
+                {% set letters = ['A', 'B', 'C', 'D'] %}
+
+                {% for question in questions %}
+                    <fieldset class="quiz-question ds-question">
+                        <legend>
+                            <span class="ds-question-number">
+                                {{ "%02d"|format(loop.index) }}
+                            </span>
+                            {{ question.question }}
+                        </legend>
+
+                        <div class="quiz-options">
+    <div class="ds-mascot-helper" hidden>
+
+    <div class="ds-mascot">
+        <!-- Your existing cartoon HTML goes here -->
+    </div>
+
+    <div class="ds-mascot-bubble">
+
+        <p class="ds-mascot-message">
+            Oops! That's not quite right. Would you like a hint?
+        </p>
+
+        <button type="button" class="ds-show-hint">
+            <i class="bi bi-lightbulb"></i>
+            Show me a hint
+        </button>
+
+        <p class="ds-hint-text" hidden>
+            {{ question.hint }}
+        </p>
+
+    </div>
+</div>
+                            {% for option in question.options %}
+                                <label class="quiz-option ds-option">
+                                    <input
+                                        type="radio"
+                                        name="{{ question.id }}"
+                                        value="{{ letters[loop.index0] }}"
+                                        data-correct="{{ question.answer }}"
+                                        required
+                                        {% if selected_answers.get(question.id) == letters[loop.index0] %}
+                                            checked
+                                        {% endif %}
+                                        {% if submitted %}disabled{% endif %}
+                                    >
+
+                                    <span>
+                                        <strong>{{ letters[loop.index0] }}.</strong>
+                                        {{ option }}
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        
+{% if submitted %}
+    <div class="quiz-feedback {% if feedback[question.id].correct %}correct{% else %}incorrect{% endif %}">
+        <strong>
+            {% if feedback[question.id].correct %}
+                <i class="bi bi-check-circle-fill"></i> Correct!
+            {% else %}
+                <i class="bi bi-x-circle-fill"></i> Not quite.
+            {% endif %}
+        </strong>
+
+        <p>{{ feedback[question.id].message }}</p>
+    </div>
+
+    {% if not feedback[question.id].correct %}
+        <div class="ds-mascot-helper">
+            <div class="ds-mascot-bubble">
+                <p class="ds-mascot-message">
+                    Not quite! Don't worry. Would you like a hint?
+                </p>
+
+                <div class="ds-mascot-actions">
+                    <button type="button" class="ds-hint-yes">
+                        <i class="bi bi-lightbulb"></i>
+                        Yes, give me a hint
+                    </button>
+
+                    <button type="button" class="ds-hint-no">
+                        No, thanks
+                    </button>
+                </div>
+            </div>
+
+            <div class="ds-mascot">
+                <!-- Your existing robot mascot HTML goes here -->
+            </div>
+
+            <p class="ds-hint-text" hidden>
+                {{ feedback[question.id].hint }}
+            </p>
+        </div>
+    {% endif %}
+{% endif %}
+
+                    </fieldset>
+                {% endfor %}
+
+                {% if not submitted %}
+                    <button type="submit" class="button button-primary ds-submit">
+                        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                        Submit Answers
+                    </button>
+                {% else %}
+                    <div class="quiz-result ds-result">
+                        <p class="eyebrow">YOUR PERFORMANCE</p>
+                        <h3>Quiz results</h3>
+
+                        <p class="score-display">
+                            {{ score }} / {{ questions|length }}
+                        </p>
+
+                        {% if score == questions|length %}
+                            <p>Excellent! You answered every question correctly.</p>
+                        {% elif score >= questions|length / 2 %}
+                            <p>Good effort! Review any incorrect answers to improve.</p>
+                        {% else %}
+                            <p>Keep practising. Review the explanations and try again.</p>
+                        {% endif %}
+
+                        <div class="ds-result-actions">
+                            <a href="{{ url_for('learn', category=selected_category) }}"
+                               class="button button-primary">
+                                <i class="bi bi-arrow-repeat"></i> Try Again
+                            </a>
+                            <a href="{{ url_for('learn') }}"
+                               class="button button-secondary">
+                                Choose Another Quiz
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+
+    {% endif %}
+
+    <!-- Video learning library -->
+    <section class="ds-video-section">
+        <div class="ds-section-heading">
+            <div>
+                <p class="eyebrow">WATCH · LEARN · APPLY</p>
+                <h2>Cybersecurity video lab</h2>
+                <p>Short awareness lessons to help turn security knowledge into safer habits.</p>
+            </div>
+            <span class="ds-count-badge">
+                <i  class="bi bi-play-btn" aria-hidden="true"></i>
+                VIDEO LESSONS
+            </span>
+        </div>
+
+        <div class="ds-video-grid">
+
+            <article class="ds-video-card">
+                <div class="ds-video-frame">
+                    <iframe
+                        src="https://www.youtube-nocookie.com/embed/0Wd3JoUHXno"
+                        title="Cybersecurity awareness: Passwords"
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="ds-video-info">
+                    <span class="ds-video-tag">ACCOUNT SECURITY</span>
+                    <h3>Protect your passwords</h3>
+                    <p>Learn why passwords matter and how better habits can help protect accounts.</p>
+                    <a href="https://www.staysafeonline.org/articles/security-awareness-episodes"
+                       target="_blank" rel="noopener noreferrer">
+                        Video source and more lessons
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+            </article>
+
+            <article class="ds-video-card">
+                <div class="ds-video-frame">
+                    <iframe
+                        src="https://www.youtube-nocookie.com/embed/D_yAYhjNE-0"
+                        title="Cybersecurity awareness: Phishing and ransomware"
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="ds-video-info">
+                    <span class="ds-video-tag">THREAT AWARENESS</span>
+                    <h3>Phishing and ransomware</h3>
+                    <p>Understand how deceptive messages and harmful downloads can put devices and data at risk.</p>
+                    <a href="https://www.staysafeonline.org/articles/security-awareness-episodes"
+                       target="_blank" rel="noopener noreferrer">
+                        Video source and more lessons
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+            </article>
+
+            <article class="ds-video-card">
+                <div class="ds-video-frame">
+                    <iframe
+                        src="https://www.youtube-nocookie.com/embed/7Apu1EWZPhQ"
+                        title="Cybersecurity awareness: Internet downloads"
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="ds-video-info">
+                    <span class="ds-video-tag">SAFE DOWNLOADS</span>
+                    <h3>Think before downloading</h3>
+                    <p>Build safer habits when downloading files and software from the internet.</p>
+                    <a href="https://www.staysafeonline.org/articles/security-awareness-episodes"
+                       target="_blank" rel="noopener noreferrer">
+                        Video source and more lessons
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+            </article>
+
+        </div>
+
+        <div class="ds-video-note">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <p>
+                Videos are hosted by an external service. If an embed is unavailable,
+                use the source link to find the lesson. Viewing a video is optional
+                and does not affect your quiz score.
+            </p>
+        </div>
+    </section>
+
+    <aside class="ds-safety-reminder">
+        <i class="bi bi-shield-check" aria-hidden="true"></i>
+        <div>
+            <h3>Stay curious. Stay cautious.</h3>
+            <p>
+                Cybersecurity tools can help identify warning signs, but no scan
+                or lesson can guarantee that a file, link or message is safe.
+            </p>
+        </div>
+    </aside>
+
+</section>
+
+<script>
+document.querySelectorAll(".ds-mascot-helper").forEach((helper) => {
+    const yesButton = helper.querySelector(".ds-hint-yes");
+    const noButton = helper.querySelector(".ds-hint-no");
+    const message = helper.querySelector(".ds-mascot-message");
+    const hint = helper.querySelector(".ds-hint-text");
+
+    yesButton.addEventListener("click", () => {
+        message.textContent = hint.textContent.trim();
+
+        yesButton.hidden = true;
+        noButton.textContent = "Got it!";
+    });
+
+    noButton.addEventListener("click", () => {
+        helper.hidden = true;
+    });
+});
+</script>
+<script>
+document.querySelectorAll(".ds-question").forEach((question) => {
+
+    const options = question.querySelectorAll('input[type="radio"]');
+    const helper = question.querySelector(".ds-mascot-helper");
+
+    if (!helper) return;
+
+    const message = helper.querySelector(".ds-mascot-message");
+    const hintButton = helper.querySelector(".ds-show-hint");
+    const hint = helper.querySelector(".ds-hint-text");
+
+    options.forEach((option) => {
+
+        option.addEventListener("change", () => {
+
+            const isCorrect = option.value === option.dataset.correct;
+
+            if (isCorrect) {
+                helper.hidden = true;
+                return;
+            }
+
+            helper.hidden = false;
+
+            message.textContent =
+                "Oops! That's not quite right. Would you like a hint?";
+
+            hint.hidden = true;
+            hintButton.hidden = false;
+        });
+
+    });
+
+    hintButton.addEventListener("click", () => {
+
+        message.textContent = hint.textContent.trim();
+
+        hint.hidden = true;
+        hintButton.hidden = true;
+
+    });
+
+});
+</script>
+
+{% endblock %}

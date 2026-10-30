@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} | CyberGuard{% endblock %}
+{% block content %}
+<section class="tools-section">
+  <div class="result-card" role="alert">
+    <p class="eyebrow">CYBERGUARD NOTICE</p>
+    <h1>{{ code }} · {{ title }}</h1>
+    <p>{{ message }}</p>
+    <a class="button button-primary" href="{{ url_for('home') }}">Return home</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,115 @@
+
+{% extends "base.html" %}
+
+{% block title %}Email Scanner | CyberGuard{% endblock %}
+
+{% block content %}
+<section class="tools-section">
+    <div class="section-heading">
+        <p class="eyebrow">PHISHING DETECTION</p>
+        <h2>Analyse a suspicious email</h2>
+<p style="color: #102A43;">
+    Check for warning signs before responding or clicking.
+
+
+</p>    </div>
+
+    <form method="POST" class="scan-form">
+        <label for="sender">Sender address</label>
+        <input
+            id="sender"
+            name="sender"
+            type="text"
+            maxlength="254"
+            placeholder="example@company.com"
+            value="{{ sender or '' }}"
+        >
+
+        <label for="subject">Email subject</label>
+        <input
+            id="subject"
+            name="subject"
+            type="text"
+            maxlength="300"
+            placeholder="Your account requires attention"
+            value="{{ subject or '' }}"
+        >
+
+        <label for="body">Email message</label>
+        <textarea
+            id="body"
+            name="body"
+            rows="8"
+            maxlength="10000"
+            required
+            placeholder="Paste the email text here..."
+        >{{ body or '' }}</textarea>
+
+        <p class="privacy-note">
+            Do not paste passwords or confidential information.
+            The scanner analyses the email locally, but detected findings
+            may be sent to Google's Gemini service for an AI explanation.
+        </p>
+
+        <button class="button button-primary" type="submit">
+            Analyse Email
+        </button>
+    </form>
+
+    {% if error %}
+        <div class="result-card">
+            <h3>Unable to analyse email</h3>
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <div class="result-card">
+            <p class="eyebrow">ANALYSIS RESULT</p>
+
+            <h2 style="color: #ececec;">{{ result.verdict }}</h2>
+
+            <p>
+                Risk indicator score:
+                <strong>{{ result.score }}/10</strong>
+            </p>
+
+            <p>{{ result.advice }}</p>
+
+            <h3 style="color: #ececec;">Evidence found</h3>
+
+            {% if result.findings %}
+                <ul>
+                    {% for finding in result.findings %}
+                        <li>
+                            <strong>{{ finding.type }}:</strong>
+                            {{ finding.evidence }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No warning patterns were detected by these rules.</p>
+            {% endif %}
+
+            {% if result.ai_explanation %}
+                <hr>
+
+                <h3 style="color: #ececec;">AI Security Explanation</h3>
+
+                <div style="color: #ececec;" class="ai-explanation">{{ result.ai_explanation_html | safe }}</div>
+            {% endif %}
+
+            <h3 style="color: #ececec;">What could have happened?</h3>
+
+            <p>
+                Potential consequences depend on what the email contains
+                and what actions were taken. For example, if a genuine
+                phishing link led to a fake login page and you entered
+                your password, an attacker could potentially obtain it.
+                Receiving an email alone does not mean your account
+                has been compromised.
+            </p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
