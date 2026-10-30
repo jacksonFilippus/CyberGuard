@@ -14,6 +14,7 @@ from scanners.virus_total import (
     lookup_file_hash,
     lookup_url,
 )
+from scanners.safe_browsing import lookup_safe_browsing
 
 load_dotenv()
 
@@ -520,6 +521,8 @@ def email_scan():
 
 
 
+
+
 @app.route("/url", methods=["GET", "POST"])
 def url_scan():
     result = None
@@ -531,30 +534,118 @@ def url_scan():
 
         if not submitted_url:
             error = "Please enter a URL."
+
         elif len(submitted_url) > 2048:
             error = "The URL is too long."
+
         else:
             try:
-                
+                # 1. Run local URL checks.
                 result = analyse_url(submitted_url)
+
                 if result.get("valid"):
-                    result["threat_report"] = lookup_url(result["url"])
+                    # 2. Check VirusTotal.
+                    result["threat_report"] = lookup_url(
+                        result["url"]
+                    )
+
+                    # 3. Check Google Safe Browsing.
+                    result["safe_browsing"] = lookup_safe_browsing(
+                        result["url"]
+                    )
+
+                    vt = result["threat_report"]
+                    sb = result["safe_browsing"]
+
+                    vt_status = vt.get("status")
+                    sb_status = sb.get("status")
+                    vt_severity = vt.get("severity")
+
+                    # 4. Determine an appropriately cautious verdict.
+                    if sb_status == "flagged":
+                        result["overall_verdict"] = (
+                            "Google Safe Browsing threat match"
+                        )
+
+                    elif vt_severity == "strong_threat_signal":
+                        result["overall_verdict"] = (
+                            "Multiple VirusTotal engines report a threat"
+                        )
+
+                    elif vt_severity == "multiple_engine_warning":
+                        result["overall_verdict"] = (
+                            "Multiple VirusTotal engine warnings"
+                        )
+
+                    elif vt_severity == "single_engine_warning":
+                        result["overall_verdict"] = (
+                            "Single VirusTotal engine warning – investigate"
+                        )
+
+                    elif vt_status == "flagged":
+                        result["overall_verdict"] = (
+                            "VirusTotal threat report requires investigation"
+                        )
+
+                    elif vt_status == "suspicious":
+                        result["overall_verdict"] = (
+                            "Suspicious reputation reported"
+                        )
+
+                    elif result.get("findings"):
+                        result["overall_verdict"] = (
+                            "Local warning signs found"
+                        )
+
+                    elif (
+                        vt_status == "no_known_detection"
+                        and sb_status == "no_known_detection"
+                    ):
+                        result["overall_verdict"] = (
+                            "No known threat-list detections"
+                        )
+
+                    else:
+                        result["overall_verdict"] = (
+                            "Incomplete security assessment"
+                        )
+
+                    # 5. Prepare evidence for Gemini.
+                    security_context = {
+                        "local_analysis": {
+                            "verdict": result.get("verdict"),
+                            "score": result.get("score"),
+                            "findings": result.get("findings", []),
+                        },
+                        "virustotal": vt,
+                        "google_safe_browsing": sb,
+                    }
+
+                    # 6. Generate AI explanation.
+                    result["ai_explanation"] = explain_security_findings(
+                        scan_type="URL",
+                        findings=result.get("findings", []),
+                        verdict=result["overall_verdict"],
+                        security_context=security_context,
+                    )
+
+                    result["ai_explanation_html"] = (
+                        create_ai_explanation_html(
+                            result["ai_explanation"]
+                        )
+                    )
+
                 else:
                     result["threat_report"] = None
-
-                result["ai_explanation"] = explain_security_findings(
-                    scan_type="URL",
-                    findings=result["findings"],
-                    verdict=result["verdict"]
-                )
-
-                result["ai_explanation_html"] = create_ai_explanation_html(
-                    result["ai_explanation"]
-                )
+                    result["safe_browsing"] = None
+                    result["overall_verdict"] = "Invalid URL"
 
             except Exception:
                 app.logger.exception("URL analysis failed")
-                error = "An unexpected error occurred. Please try again."
+                error = (
+                    "An unexpected error occurred during URL analysis. "
+                    "Please try again."
+                )
 
     return render_template(
         "url_scan.html",
@@ -562,8 +653,6 @@ def url_scan():
         error=error,
         submitted_url=submitted_url,
     )
-
-
 
 
 @app.route("/file", methods=["GET", "POST"])
@@ -725,12 +814,11 @@ def learn():
 
 
 
-
 if __name__ == "__main__":
-    # Debug mode is opt-in; never expose the interactive debugger by default.
+    # Allow other devices on the same network to access CyberGuard.
     import os
     app.run(
-        host=os.getenv("FLASK_HOST", "127.0.0.1"),
+        host=os.getenv("FLASK_HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "5000")),
         debug=os.getenv("FLASK_DEBUG", "false").lower() == "true"
     )

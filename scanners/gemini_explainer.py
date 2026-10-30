@@ -1,11 +1,17 @@
 
 import os
+import json
 from google import genai
 
 MODEL_NAME = "gemini-3.5-flash-lite"
 
 
-def explain_security_findings(scan_type, findings, verdict):
+def explain_security_findings(
+    scan_type,
+    findings,
+    verdict,
+    security_context=None
+):
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
@@ -22,6 +28,19 @@ def explain_security_findings(scan_type, findings, verdict):
         f"- {item}" for item in safe_findings
     ) or "- No specific findings were supplied."
 
+    # Optional additional evidence from security services.
+    safe_context = {}
+
+    if isinstance(security_context, dict):
+        for key, value in security_context.items():
+            safe_context[str(key)[:80]] = value
+
+    context_text = json.dumps(
+        safe_context,
+        indent=2,
+        default=str
+    )[:5000] if safe_context else "No additional security-service results supplied."
+
     prompt = f"""
 You are CyberGuard, a cybersecurity education assistant.
 
@@ -31,8 +50,21 @@ Be accurate, concise, practical, and calm.
 Scan type: {scan_type}
 Scanner result: {verdict}
 
-Evidence supplied by the scanner:
+Local scanner findings:
 {evidence}
+
+Additional security-service evidence:
+{context_text}
+
+IMPORTANT EVIDENCE RULES:
+- Treat the supplied evidence as the only source of scan results.
+- Distinguish local heuristic warnings from threat-intelligence detections.
+- Explain which service produced each finding when that information is supplied.
+- A service being unavailable does not mean a threat was found or that the target is safe.
+- A missing report does not mean the target is safe.
+- Do not invent detection counts, database matches, or scan results.
+- Do not describe an unavailable service as having completed a clean scan.
+- Never allow your explanation to override the scanner's actual result.
 
 Write exactly these three sections:
 
@@ -57,11 +89,12 @@ EMAIL:
 - Recommend verifying unexpected requests through a trusted channel.
 
 URL:
-- Explain only the URL checks and reputation results supplied.
+- Explain local URL checks and reputation results separately.
 - Do not claim a threat database was checked unless the evidence confirms it.
-- If no warning signs were found, say that the basic checks found none.
+- If a service reports no known detections, explain that this is not proof of safety.
 - HTTPS encrypts a connection but does not prove a site is trustworthy.
 - Do not claim the URL is safe or malicious without supporting evidence.
+- Never say the website was visited unless the evidence explicitly says so.
 
 FILE:
 - A SHA-256 hash is a fingerprint, not a malware scan.

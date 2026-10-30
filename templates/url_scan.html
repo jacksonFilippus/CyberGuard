@@ -5,16 +5,19 @@
 
 {% block content %}
 <section class="tools-section">
+
     <div class="section-heading">
         <p class="eyebrow">LINK SECURITY</p>
         <h2>Check a suspicious link</h2>
-<p style="color: #102A43;">
-    Inspect basic URL warning signs without opening the website.
-
-</p>    </div>
+        <p style="color: #102A43;">
+            Analyse a website address using local security checks
+            and available threat-intelligence services.
+        </p>
+    </div>
 
     <form method="POST" class="scan-form">
         <label for="url">Website URL</label>
+
         <input
             id="url"
             name="url"
@@ -26,8 +29,10 @@
         >
 
         <p class="privacy-note">
-            This first version checks the address locally. It does not visit
-            the website or confirm whether it is malicious.
+            Your submitted URL may be shared with third-party security
+            services such as VirusTotal and Google Safe Browsing.
+            Do not submit private or internal links.
+            The scanner does not intentionally open the website.
         </p>
 
         <button class="button button-primary" type="submit">
@@ -43,49 +48,69 @@
     {% endif %}
 
     {% if result %}
-    <div class="result-card">
-        <p class="eyebrow">ANALYSIS RESULT</p>
-        <h2 style="color: #ececec;">{{ result.verdict }}</h2>
 
-        <p><strong>Address:</strong> {{ result.url }}</p>
-        <p><strong>Risk indicator score:</strong> {{ result.score }}/10</p>
+    <div class="result-card">
+
+        <p class="eyebrow">ANALYSIS RESULT</p>
+
+        <h2 style="color: #ececec;">
+    {{ result.overall_verdict or result.verdict }}
+</h2>
+
+<p>
+    <strong>Local scanner result:</strong>
+    {{ result.verdict }}
+</p>
+
+        <p>
+            <strong>Address:</strong>
+            {{ result.url }}
+        </p>
+
+        <p>
+            <strong>Local risk indicator score:</strong>
+            {{ result.score }}/10
+        </p>
+
         <p>{{ result.advice }}</p>
 
-        <h3 style="color: #ececec;">Findings</h3>
+        <hr>
 
-        {% if result.ai_explanation %}
-    <hr>
-    <h3 style="color: #ececec;">AI Security Explanation</h3>
-    <div class="ai-explanation">{{ result.ai_explanation_html | safe }}</div>
-{% endif %}
+        <h3 style="color: #ececec;">1. Local URL analysis</h3>
 
-        {% if result.findings %}
-        <ul>
-            {% for finding in result.findings %}
-            <li>{{ finding }}</li>
-            {% endfor %}
-        </ul>
+        {% if result.valid %}
+            <p> <strong>Status:</strong> Completed</p>
+
+            {% if result.findings %}
+                <ul>
+                    {% for finding in result.findings %}
+                    <li>{{ finding }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No obvious warning signs were found by the local checks.</p>
+            {% endif %}
         {% else %}
-        <p>No obvious warning signs were found by these checks.</p>
+            <p>The submitted address could not be validated.</p>
         {% endif %}
 
-        <h3 style="color: #ececec;">What could have happened?</h3>
-        <p>
-            If a link leads to a fraudulent login page, entering your
-            password could expose your account. This scan has not established
-            that this particular website does so.
-        </p>
-    </div>
-    
-{% if result.threat_report %}
-    <hr>
-    <h3 style="color: #102A43;">VirusTotal Reputation Report</h3>
+        <hr>
 
+        <h3 style="color: #ececec;">2. VirusTotal reputation</h3>
+
+        
+{% if result.threat_report %}
     <p>
-        {{ result.threat_report.message }}
+        <strong>Status:</strong>
+        {{ result.threat_report.status | replace("_", " ") | title }}
     </p>
 
-    {% if result.threat_report.status in ["flagged", "suspicious", "no_known_detection"] %}
+    <p>{{ result.threat_report.message }}</p>
+
+    {% if result.threat_report.status in [
+        "flagged", "suspicious", "no_known_detection"
+    ] %}
+
         <ul>
             <li>Malicious detections: {{ result.threat_report.malicious }}</li>
             <li>Suspicious detections: {{ result.threat_report.suspicious }}</li>
@@ -93,9 +118,52 @@
             <li>Undetected: {{ result.threat_report.undetected }}</li>
             <li>Total reported results: {{ result.threat_report.total }}</li>
         </ul>
-    {% endif %}
-{% endif %}
 
     {% endif %}
+
+    {% if result.threat_report.severity %}
+        <p>
+            <strong>Detection assessment:</strong>
+            {{ result.threat_report.severity | replace("_", " ") | title }}
+        </p>
+    {% endif %}
+
+    {% if result.threat_report.analysis_date %}
+        <p>
+            <strong>Analysis date:</strong>
+            {{ result.threat_report.analysis_date }}
+        </p>
+    {% endif %}
+
+    {% if result.threat_report.engine_detections %}
+        <h4>Security engines reporting warnings</h4>
+
+        <ul>
+            {% for detection in result.threat_report.engine_detections %}
+                <li>
+                    <strong>{{ detection.engine }}</strong>:
+                    {{ detection.category | title }}
+                    — {{ detection.result }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No individual engine warning details were returned.</p>
+    {% endif %}
+
+    {% if result.threat_report.report_url %}
+        <p>
+            <a href="{{ result.threat_report.report_url }}"
+               target="_blank"
+               rel="noopener noreferrer">
+                View full VirusTotal report
+            </a>
+        </p>
+    {% endif %}
+
+{% else %}
+    <p>VirusTotal results are unavailable.</p>
+{% endif %}
+
 </section>
 {% endblock %}
